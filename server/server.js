@@ -1,6 +1,6 @@
 var express    = require('express');
 var bodyParser = require('body-parser');
-
+const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo}     = require('./models/todo');
 var {User}     = require('./models/user');
@@ -15,10 +15,35 @@ app.post('/todos',(req, res)=>{
         res.send(todoDoc);
     },(e)=>{
         res.Status(400).send(e);
+    });
+});
+app.get('/todos',(req,res)=>{
+    Todo.find().then((todo)=>{
+        res.send(todo);
+    },(e)=>{
+        console.log(e);
     })
-})
+});
+
+/** Getting an individual Resource GET/todo:id */
+app.get('/todos/:id',(req, res)=>{
+    var id = req.params.id;
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send(`Invalid id ${id}`);
+    }
+    Todo.findById(id).then((todo)=>{
+        if(!todo){
+            return res.status(404).send(`Todo not found at this id:${id}`);
+        }
+        res.status(200).send({todo});
+    }).catch((e)=>{
+        res.status(400).send();
+    })
+});
+
+
 app.listen(3000,()=>{
     console.log('Started at port 3000');
 })
 
-
+module.exports = {app}
