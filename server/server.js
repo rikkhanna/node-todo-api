@@ -89,6 +89,25 @@ app.patch('/todos/:id',(req,res)=>{
     }).catch((e)=>{res.status(400).send(e)});
 });
 
+/** Adding a user */
+
+app.post('/users',(req, res)=>{
+
+    // _.pick() will return an object
+
+    var body = _.pick(req.body,['email','password']);
+                    // User({body}) do not pass body object like this 
+    var user = new User(body); // correct way
+
+// // save() is used to save the doc into the collection
+
+    user.save().then((userDoc)=>{
+        res.send({userDoc});
+    }).catch((e)=>{
+        res.status(400).send(e);
+    });
+});
+
 app.listen(port,()=>{
     console.log(`Started at port ${port}`);
 })
